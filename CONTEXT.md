@@ -5,7 +5,7 @@
 
 ## Статус
 - **Ветка**: `plan-1-mvp`
-- **Последний коммит**: `20a4da6` — feat: интерфейс ProjectStore и LocalStorageStore
+- **Последний коммит**: `3eb02b8` — feat: шаринг проекта через lz-string в URL-hash
 
 ## Task 1: Каркас проекта (DONE)
 
@@ -116,8 +116,29 @@ vite.config.ts
 ✓ Все 11 тестов зелёные (smoke + model + validate + 3 новых store)
 ✓ Коммит: `20a4da6`
 
+## Task 5: Шаринг ссылкой через lz-string (DONE)
+
+### Что сделано
+- Реализована система шаринга проектов через URL-hash согласно TDD строго
+- Функция `encodeShare(project: RoomProject): string` — сжимает JSON через lz-string, результат вида `#p=...`
+- Функция `decodeShare(hash: string): RoomProject | null` — извлекает и разжимает, валидирует через `validateProject()`
+- Использование встроенной библиотеки lz-string (уже в dependencies)
+
+### Механизм
+- Проект JSON → `JSON.stringify()` → `compressToEncodedURIComponent()` → помещается в hash после `#p=`
+- При декодировании: парсинг hash regex → `decompressFromEncodedURIComponent()` → `JSON.parse()` → валидация
+- Обработка ошибок: возвращает null при неверном формате, битом JSON, невалидном проекте
+
+### Файлы
+- `src/core/share.ts` — функции кодирования/декодирования
+- `tests/share.test.ts` — 2 теста (кодирование без потерь, отклонение мусора)
+
+### Результаты
+✓ Все 13 тестов зелёные (11 старых + 2 новых)
+✓ Коммит: `3eb02b8`
+
 ## Следующие шаги
-- Task 5: Конструктор Application (инжекция ProjectStore, управление состоянием)
-- Task 6: Базовая сцена Three.js
-- Task 7: Rendering 3D стен и полов
-- Task 8: UI слой (Canvas + HTML layout)
+- Task 6: Конструктор Application (инжекция ProjectStore, управление состоянием, работа с URL-hash)
+- Task 7: Базовая сцена Three.js
+- Task 8: Rendering 3D стен и полов
+- Task 9: UI слой (Canvas + HTML layout)
