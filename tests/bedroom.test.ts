@@ -36,6 +36,15 @@ describe('generateBedroom', () => {
     }
   });
 
+  it('квадратные комнаты от 2600: кровать всегда есть', () => {
+    for (let s = 2600; s <= 3000; s += 100) {
+      const r = room(s, s);
+      const items = generateBedroom(r, [door]);
+      expect(layoutProblems(items, r, [door]), `${s}x${s}`).toEqual([]);
+      expect(items.find((i) => i.type === 'bed'), `${s}x${s}: нет кровати`).toBeTruthy();
+    }
+  });
+
   it('крошечная комната: не падает и не даёт невалидной раскладки', () => {
     const r = room(2000, 2000);
     const items = generateBedroom(r, [door]);
