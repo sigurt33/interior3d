@@ -1,6 +1,7 @@
 import { defaultProject, ROOM_NAMES, type Opening, type RoomProject, type RoomType, type WallIndex } from '../core/model';
 import { STYLES } from '../core/styles';
 import { TEMPLATES } from '../templates/index';
+import { validateProject } from '../core/validate';
 
 // Мастер: тип → размеры и проёмы → стиль → готово
 export function mountWizard(root: HTMLElement, onDone: (p: RoomProject) => void) {
@@ -43,11 +44,34 @@ export function mountWizard(root: HTMLElement, onDone: (p: RoomProject) => void)
       <label>Стена <input id="ww" type="number" min="0" max="3" value="${winWall}" style="width:100%;padding:8px"></label>
       <label>Отступ, мм <input id="wo" type="number" value="${winOffset}" style="width:100%;padding:8px"></label>
       <label>Ширина окна, мм <input id="wd" type="number" value="${winWidth}" style="width:100%;padding:8px"></label>
+      <div id="err" style="color:#f66"></div>
       <button id="next" style="padding:14px;font-size:16px">Дальше</button>`);
     root.querySelector<HTMLButtonElement>('#next')!.onclick = () => {
+      // Валидация ДО перехода: пустое поле → Number('')===0, а NaN/отрицательные
+      // размеры дали бы молчаливо пустую комнату. Значения полей не сбрасываем.
+      const inRange = (v: number, min: number, max: number) => Number.isFinite(v) && v >= min && v <= max;
+      const winOn = root.querySelector<HTMLInputElement>('#hw')!.checked;
+      const firstError = (): string | null => {
+        if (!inRange(num('w'), 1500, 30000)) return 'Ширина: введите число от 1500 до 30000 мм';
+        if (!inRange(num('l'), 1500, 30000)) return 'Длина: введите число от 1500 до 30000 мм';
+        if (!inRange(num('h'), 2000, 5000)) return 'Высота потолка: введите число от 2000 до 5000 мм';
+        if (!inRange(num('dw'), 0, 3)) return 'Стена двери: введите число от 0 до 3';
+        if (!Number.isFinite(num('do')) || num('do') < 0) return 'Отступ двери: введите число не меньше 0';
+        if (winOn) {
+          if (!inRange(num('ww'), 0, 3)) return 'Стена окна: введите число от 0 до 3';
+          if (!Number.isFinite(num('wo')) || num('wo') < 0) return 'Отступ окна: введите число не меньше 0';
+          if (!Number.isFinite(num('wd')) || num('wd') < 0) return 'Ширина окна: введите число не меньше 0';
+        }
+        return null;
+      };
+      const err = firstError();
+      if (err) {
+        root.querySelector<HTMLDivElement>('#err')!.textContent = err;
+        return;
+      }
       width = num('w'); length = num('l'); height = num('h');
       doorWall = num('dw') as WallIndex; doorOffset = num('do');
-      hasWindow = root.querySelector<HTMLInputElement>('#hw')!.checked;
+      hasWindow = winOn;
       winWall = num('ww') as WallIndex; winOffset = num('wo'); winWidth = num('wd');
       step3();
     };
@@ -79,6 +103,13 @@ export function mountWizard(root: HTMLElement, onDone: (p: RoomProject) => void)
     const tpl = TEMPLATES[type]!;
     p.furniture = tpl.generate(p.room, p.openings);
     p.lighting.groups = tpl.lightGroups.map((id) => ({ id, on: true, brightness: 0.8 }));
+    // Страховка: при рабочей валидации в step2 сюда попадать не должно
+    const v = validateProject(p);
+    if (!v.ok) {
+      step2();
+      root.querySelector<HTMLDivElement>('#err')!.textContent = v.errors[0];
+      return;
+    }
     onDone(p);
   };
 
