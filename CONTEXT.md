@@ -556,5 +556,26 @@ vite.config.ts
   ww=2.5 → аналогичная ошибка окна; wd=100 → «Ширина окна: введите число от 300
   до 10000 мм»; валидные значения → шаг 3 открылся.
 
+### Task 15: деплой на GitHub Pages (2026-08-11)
+- **Живой сайт: https://sigurt33.github.io/interior3d/**
+- Репозиторий: https://github.com/sigurt33/interior3d (публичный, аккаунт sigurt33).
+  Ветки: `master` (= `plan-1-mvp`), `plan-1-mvp`, `gh-pages` (статика).
+- **Деплой через ветку `gh-pages`** (branch-based Pages, build_type=legacy):
+  `npm run build` → `npx gh-pages -d dist -m "deploy: ..."`. Обновление сайта — повторить
+  эти две команды. `vite.config.ts` уже имеет `base: './'` — относительные пути работают
+  на Pages без имени репо.
+- **CI-workflow отложен**: у gh-токена нет scope `workflow` (device-авторизация не прошла
+  из-за сетевых сбоев VPN), а GitHub отклоняет push любой истории с созданием
+  `.github/workflows/*` без этого scope. Готовый workflow сохранён в
+  `docs/pages.workflow.yml` — когда появится scope (`gh auth refresh -s workflow`),
+  скопировать его в `.github/workflows/pages.yml` и закоммитить
+  (Actions-деплой: npm ci → test → build → deploy). Коммит с workflow вырезан
+  из истории до пуша (mixed reset, remote был пуст — безопасно).
+- Проверка живого сайта: curl 200; Playwright (чистый контекст): мастер «Какая комната?»
+  (Спальня активна, остальные «скоро»), полный проход Спальня → Дальше → Бежевый
+  минимализм → 3D-комната с мебелью, пресетами камеры и панелью света
+  (скриншоты live-wizard.png, live-viewer.png). Ошибок консоли нет.
+
 ## Следующие шаги
-- Task 15: UI слой полной компоновки (список проектов, сохранение через ProjectStore, роутинг по URL-hash)
+- UI слой полной компоновки (список проектов, сохранение через ProjectStore, роутинг по URL-hash)
+- Активировать Actions-деплой из docs/pages.workflow.yml после получения workflow-scope
