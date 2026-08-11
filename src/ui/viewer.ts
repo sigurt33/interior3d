@@ -6,7 +6,7 @@ import { LIGHT_PRESETS, applyPreset } from '../lighting/engine';
 import { encodeShare } from '../core/share';
 
 const GROUP_NAMES: Record<string, string> = {
-  ceiling: 'Потолочный', pendants: 'Подвесы', accent: 'Подсветка',
+  ceiling: 'Потолочный', pendants: 'Подвесы', accent: 'Подсветка', spots: 'Споты', mirror: 'Подсветка зеркала',
 };
 const PRESET_NAMES: Record<string, string> = {
   'day': 'День', 'evening-cozy': 'Вечер уютный', 'night-accent': 'Ночь с подсветкой', 'work': 'Рабочий свет',
@@ -37,7 +37,7 @@ export function mountViewer(root: HTMLElement, project: RoomProject, onSave?: (p
   const CAMERA_VIEWS: Record<string, [number, number, number]> = {
     'Общий': [W * 0.88, H * 0.92, L * 0.88],
     'От двери': [W / 2, H * 0.6, L * 0.15],
-    'Кровать': [W / 2, H * 0.55, L * 0.75],
+    'Детали': [W / 2, H * 0.55, L * 0.75],
     'Сверху': [W / 2, H * 2.5, L / 2 + 0.01],
   };
   const setView = (name: string) => {

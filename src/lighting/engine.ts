@@ -54,19 +54,19 @@ interface PresetDef {
 export const LIGHT_PRESETS: Record<string, PresetDef> = {
   'day': {
     sunTime: 13, colorTemp: 4500,
-    groups: { ceiling: { on: false, brightness: 0.5 }, pendants: { on: false, brightness: 0.5 }, accent: { on: false, brightness: 0.5 } },
+    groups: { ceiling: { on: false, brightness: 0.5 }, pendants: { on: false, brightness: 0.5 }, accent: { on: false, brightness: 0.5 }, spots: { on: false, brightness: 0.5 }, mirror: { on: false, brightness: 0.5 } },
   },
   'evening-cozy': {
     sunTime: 20, colorTemp: 2700,
-    groups: { ceiling: { on: true, brightness: 0.35 }, pendants: { on: true, brightness: 0.7 }, accent: { on: true, brightness: 0.8 } },
+    groups: { ceiling: { on: true, brightness: 0.35 }, pendants: { on: true, brightness: 0.7 }, accent: { on: true, brightness: 0.8 }, spots: { on: true, brightness: 0.4 }, mirror: { on: true, brightness: 0.5 } },
   },
   'night-accent': {
     sunTime: 23, colorTemp: 2700,
-    groups: { ceiling: { on: false, brightness: 0.3 }, pendants: { on: false, brightness: 0.3 }, accent: { on: true, brightness: 1 } },
+    groups: { ceiling: { on: false, brightness: 0.3 }, pendants: { on: false, brightness: 0.3 }, accent: { on: true, brightness: 1 }, spots: { on: false, brightness: 0.3 }, mirror: { on: false, brightness: 0.3 } },
   },
   'work': {
     sunTime: 13, colorTemp: 5500,
-    groups: { ceiling: { on: true, brightness: 1 }, pendants: { on: true, brightness: 1 }, accent: { on: false, brightness: 0.5 } },
+    groups: { ceiling: { on: true, brightness: 1 }, pendants: { on: true, brightness: 1 }, accent: { on: false, brightness: 0.5 }, spots: { on: true, brightness: 1 }, mirror: { on: true, brightness: 1 } },
   },
 };
 

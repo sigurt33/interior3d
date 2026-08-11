@@ -58,4 +58,19 @@ describe('presets', () => {
     // исходный state не мутирован
     expect(state.preset).toBeNull();
   });
+
+  it('пресеты управляют новыми группами spots и mirror', () => {
+    const state: LightingState = {
+      preset: null, sunTime: 13, colorTemp: 4000,
+      groups: [
+        { id: 'spots', on: false, brightness: 1 },
+        { id: 'mirror', on: false, brightness: 1 },
+      ],
+    };
+    const work = applyPreset(state, 'work');
+    expect(work.groups.find((g) => g.id === 'spots')?.on).toBe(true);
+    expect(work.groups.find((g) => g.id === 'mirror')?.on).toBe(true);
+    const night = applyPreset(state, 'night-accent');
+    expect(night.groups.find((g) => g.id === 'spots')?.on).toBe(false);
+  });
 });

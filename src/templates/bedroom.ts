@@ -1,32 +1,14 @@
-import type { FurnitureItem, Opening, RoomProject, WallIndex } from '../core/model';
-import { layoutProblems, placeAtWall } from '../core/layout';
+import type { FurnitureItem, LightPoint, Opening, RoomProject, WallIndex } from '../core/model';
+import { GAP, makeTemplateHelpers } from './helpers';
 
 export const BEDROOM_LIGHT_GROUPS = ['ceiling', 'pendants', 'accent'];
-
-const GAP = 100; // мм — зазор между соседними предметами мебели
 
 export function generateBedroom(
   room: RoomProject['room'],
   openings: Opening[],
 ): FurnitureItem[] {
-  const { width: W, length: L } = room;
-  const wallLen = (w: number) => (w % 2 === 0 ? W : L);
   const door = openings.find((o) => o.kind === 'door' || o.kind === 'arch');
-  const placed: FurnitureItem[] = [];
-
-  const tryAdd = (item: FurnitureItem): boolean => {
-    if (layoutProblems([...placed, item], room, openings).length > 0) return false;
-    placed.push(item);
-    return true;
-  };
-
-  const mk = (
-    id: string, type: string, wall: WallIndex, offset: number,
-    size: { w: number; d: number; h: number },
-  ): FurnitureItem => ({
-    id, type, wall, size, options: {},
-    ...placeAtWall(wall, offset, size, W, L),
-  });
+  const { placed, wallLen, tryAdd, mk } = makeTemplateHelpers(room, openings);
 
   // 1. Кровать — приоритетно стена напротив двери, по центру стены; затем остальные стены,
   //    с уменьшением размера кровати, если полноразмерная нигде не влезает.
@@ -93,4 +75,25 @@ export function generateBedroom(
   }
 
   return placed;
+}
+
+// Точки света спальни: подвесы над тумбочками (fallback — центр), подсветка у кровати
+export function bedroomLightPoints(
+  room: RoomProject['room'],
+  furniture: FurnitureItem[],
+): LightPoint[] {
+  const pts: LightPoint[] = [];
+  const stands = furniture.filter((f) => f.type === 'nightstand');
+  for (const s of stands)
+    pts.push({ group: 'pendants', x: s.position.x, y: room.height - 800, z: s.position.z });
+  if (stands.length === 0)
+    pts.push({ group: 'pendants', x: room.width / 2, y: room.height - 800, z: room.length / 2 });
+  const bed = furniture.find((f) => f.type === 'bed');
+  pts.push({
+    group: 'accent',
+    x: bed?.position.x ?? room.width / 2,
+    y: 150,
+    z: bed?.position.z ?? room.length / 2,
+  });
+  return pts;
 }
