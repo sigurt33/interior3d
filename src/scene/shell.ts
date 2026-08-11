@@ -5,9 +5,10 @@ import type { StyleDef } from '../core/styles';
 const M = (mm: number) => mm / 1000;
 const WALL_T = 0.1; // м
 
-// Стена в локальных координатах: вдоль X от 0 до len (м), Y вверх, толщина по Z
+// Стена в локальных координатах: вдоль X от 0 до lenM (м), Y вверх, толщина по Z
+// lenM/hM — метры; openings (offset/width/height/sill) — мм, конвертируются внутри
 export function buildWallWithOpenings(
-  len: number, h: number, openings: Opening[], mat: THREE.Material,
+  lenM: number, hM: number, openings: Opening[], mat: THREE.Material,
 ): THREE.Group {
   const g = new THREE.Group();
   const addSeg = (x0: number, x1: number, y0: number, y1: number) => {
@@ -21,14 +22,15 @@ export function buildWallWithOpenings(
   for (const op of sorted) {
     const x0 = M(op.offset);
     const x1 = M(op.offset + op.width);
-    addSeg(cursor, x0, 0, h); // простенок до проёма
+    addSeg(cursor, x0, 0, hM); // простенок до проёма
+    // arch — как дверь, проём от пола без подоконника
     const yBottom = op.kind === 'window' ? M(op.sill ?? 900) : 0;
     const yTop = yBottom + M(op.height);
-    addSeg(x0, x1, yTop, h);          // перемычка над проёмом
+    addSeg(x0, x1, yTop, hM);          // перемычка над проёмом
     if (yBottom > 0) addSeg(x0, x1, 0, yBottom); // подоконная часть
     cursor = x1;
   }
-  addSeg(cursor, len, 0, h);
+  addSeg(cursor, lenM, 0, hM);
   return g;
 }
 
