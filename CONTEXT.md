@@ -4,8 +4,8 @@
 Веб-конструктор интерьеров на базе Three.js. SPA без сервера.
 
 ## Статус
-- **Ветка**: `plan-1-mvp`
-- **Последний коммит**: `64c7d0a` — feat: вьюер — 3D, ракурсы, панель света, шаринг
+- **Ветка**: `plan-2-rooms`
+- **Последний коммит**: `a27e251` — feat: пресеты и подписи для групп spots/mirror, ракурс «Детали»
 
 ## Task 1: Каркас проекта (DONE)
 
@@ -672,3 +672,45 @@ vite.config.ts
   новые типы комнат.
 - UI слой полной компоновки (список проектов, сохранение через ProjectStore, роутинг по URL-hash)
 - Активировать Actions-деплой из docs/pages.workflow.yml после получения workflow-scope
+
+## Task П2-9: Пресеты и подписи для новых групп света + универсальный ракурс (2026-08-12, DONE)
+
+### Описание
+Расширены пресеты освещения для управления новыми группами света (spots — кухня, mirror — ванная).
+Обновлены подписи групп света и переименован ракурс камеры для универсальности (кухня, ванная,
+спальня, детская). Реализация строго по TDD: падающий тест → RED → реализация → GREEN.
+
+### Что сделано
+
+1. **Тест** (`tests/lighting.test.ts`):
+   - Добавлен новый тест `'пресеты управляют новыми группами spots и mirror'` внутри describe('presets')
+   - Проверяет, что пресеты 'work' и 'night-accent' правильно управляют состоянием групп spots и mirror
+
+2. **Пресеты** (`src/lighting/engine.ts`):
+   - Дополнены все 4 пресета в `LIGHT_PRESETS` (day, evening-cozy, night-accent, work):
+     - `day`: spots `{ on: false, brightness: 0.5 }`, mirror `{ on: false, brightness: 0.5 }`
+     - `evening-cozy`: spots `{ on: true, brightness: 0.4 }`, mirror `{ on: true, brightness: 0.5 }`
+     - `night-accent`: spots `{ on: false, brightness: 0.3 }`, mirror `{ on: false, brightness: 0.3 }`
+     - `work`: spots `{ on: true, brightness: 1 }`, mirror `{ on: true, brightness: 1 }`
+
+3. **Подписи групп света** (`src/ui/viewer.ts`):
+   - Дополнен `GROUP_NAMES`:
+     - `spots: 'Споты'`
+     - `mirror: 'Подсветка зеркала'`
+
+4. **Ракурс камеры** (`src/ui/viewer.ts`):
+   - Переименован ключ в `CAMERA_VIEWS` `'Кровать'` → `'Детали'` (координаты не изменены)
+   - Применимо ко всем комнатам: спальня, кухня, ванная, детская
+
+### Результаты проверки
+
+✓ RED подтверждён: `npm test` до реализации — 1 тест упал (`expected false to be true`)
+✓ После реализации: `npm test` — **85 passed** (16 файлов, все зелёные)
+✓ `npm run build` — чисто, сборка успешна (vite 5.4.21)
+✓ Коммит: `a27e251` — `feat: пресеты и подписи для групп spots/mirror, ракурс «Детали»`
+
+### Файлы
+
+- `src/lighting/engine.ts` — пресеты обновлены (4 объекта groups)
+- `src/ui/viewer.ts` — GROUP_NAMES и CAMERA_VIEWS обновлены
+- `tests/lighting.test.ts` — добавлен тест для новых групп
