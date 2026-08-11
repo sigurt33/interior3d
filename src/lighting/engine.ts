@@ -72,7 +72,7 @@ export const LIGHT_PRESETS: Record<string, PresetDef> = {
 
 export function applyPreset(state: LightingState, presetId: string): LightingState {
   const def = LIGHT_PRESETS[presetId];
-  if (!def) return state;
+  if (!def) return { ...state, groups: state.groups.map((g) => ({ ...g })) };
   return {
     preset: presetId,
     sunTime: def.sunTime,
