@@ -3,6 +3,8 @@ import { layoutProblems, placeAtWall } from '../core/layout';
 
 export const BEDROOM_LIGHT_GROUPS = ['ceiling', 'pendants', 'accent'];
 
+const GAP = 100; // мм — зазор между соседними предметами мебели
+
 export function generateBedroom(
   room: RoomProject['room'],
   openings: Opening[],
@@ -61,11 +63,13 @@ export function generateBedroom(
   // 2. Тумбочки по бокам кровати (пропускаются, если не помещаются — не критично)
   if (bedWall >= 0) {
     const ns = { w: 450, d: 450, h: 500 };
-    tryAdd(mk('nightstand-l', 'nightstand', bedWall as WallIndex, bedOffset - 100 - ns.w, ns));
-    tryAdd(mk('nightstand-r', 'nightstand', bedWall as WallIndex, bedOffset + bedSize.w + 100, ns));
+    tryAdd(mk('nightstand-l', 'nightstand', bedWall as WallIndex, bedOffset - GAP - ns.w, ns));
+    tryAdd(mk('nightstand-r', 'nightstand', bedWall as WallIndex, bedOffset + bedSize.w + GAP, ns));
   }
 
   // 3. Шкаф — вдоль свободной стены, ширина подгоняется под остаток места
+  // Стена с окном не исключается: layoutProblems не проверяет окна, шкаф может встать
+  // под окном — для спальни это осознанно допустимо (План 2: в кухне это пересмотреть)
   const wardrobeWidths = [2400, 1800, 1200, 900, 600];
   for (const w of ([0, 1, 2, 3] as WallIndex[]).filter((w) => w !== bedWall)) {
     const free = wallLen(w);
