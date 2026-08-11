@@ -1,8 +1,7 @@
 import * as THREE from 'three';
 import type { FurnitureItem } from '../core/model';
 import type { StyleDef } from '../core/styles';
-
-const M = (mm: number) => mm / 1000;
+import { M } from '../core/units';
 
 export type Builder = (item: FurnitureItem, style: StyleDef) => THREE.Group;
 

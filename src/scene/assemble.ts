@@ -4,8 +4,8 @@ import { getStyle } from '../core/styles';
 import { buildRoomShell } from './shell';
 import { FURNITURE_BUILDERS } from '../furniture/builders';
 import { kelvinToRGB, sunState } from '../lighting/engine';
+import { M } from '../core/units';
 
-const M = (mm: number) => mm / 1000;
 const GROUP_BASE_INTENSITY = 25; // базовая мощность PointLight (physical units)
 
 export interface AssembledScene {

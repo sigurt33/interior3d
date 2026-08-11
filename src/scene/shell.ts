@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import type { Opening, RoomProject } from '../core/model';
 import type { StyleDef } from '../core/styles';
+import { M } from '../core/units';
 
-const M = (mm: number) => mm / 1000;
 const WALL_T = 0.1; // м
 
 // Стена в локальных координатах: вдоль X от 0 до lenM (м), Y вверх, толщина по Z
