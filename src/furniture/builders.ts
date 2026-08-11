@@ -258,6 +258,59 @@ const buildToilet: Builder = (item, _style) => {
   return g;
 };
 
+// Детская кровать с бортиками; options.accentColor — цвет бортиков (number)
+const buildKidBed: Builder = (item, style) => {
+  const g = new THREE.Group();
+  const w = M(item.size.w), d = M(item.size.d);
+  const accent = typeof item.options.accentColor === 'number'
+    ? (item.options.accentColor as number)
+    : 0x7fc8c0;
+  const base = box(w, 0.25, d, style.wood);
+  g.add(base);
+  const mattress = box(w - 0.08, 0.14, d - 0.12, style.textile);
+  mattress.position.y = 0.25 + 0.07;
+  g.add(mattress);
+  const headboard = box(w, 0.55, 0.06, accent);
+  headboard.position.set(0, 0.275, -d / 2 + 0.03);
+  g.add(headboard);
+  for (const sx of [-1, 1]) {
+    const rail = box(0.05, 0.3, d * 0.6, accent); // бортики
+    rail.name = 'rail';
+    rail.position.set(sx * (w / 2 - 0.025), 0.25 + 0.15, -d * 0.1);
+    g.add(rail);
+  }
+  const pillow = box(0.45, 0.1, 0.32, 0xffffff);
+  pillow.position.set(0, 0.39 + 0.05, -d / 2 + 0.28);
+  g.add(pillow);
+  g.userData = { id: item.id, type: 'kidBed' };
+  return g;
+};
+
+// Открытый стеллаж: боковины + полки + пара цветных «игрушек»
+const buildToyShelf: Builder = (item, style) => {
+  const g = new THREE.Group();
+  const w = M(item.size.w), d = M(item.size.d), h = M(item.size.h);
+  for (const sx of [-1, 1]) {
+    const side = box(0.02, h, d, style.wood);
+    side.position.x = sx * (w / 2 - 0.01);
+    g.add(side);
+  }
+  const shelves = 4;
+  for (let i = 0; i < shelves; i++) {
+    const shelf = box(w - 0.04, 0.02, d, style.wood);
+    shelf.position.y = 0.02 + (h - 0.04) * (i / (shelves - 1));
+    g.add(shelf);
+  }
+  const toyColors = [0xe86a6a, 0x6ab0e8, 0xe8c76a];
+  toyColors.forEach((c, i) => {
+    const toy = box(0.12, 0.12, 0.12, c);
+    toy.position.set(-w / 4 + (i * w) / 4, 0.04 + (h - 0.04) * ((i % 3) / 3) + 0.06, 0);
+    g.add(toy);
+  });
+  g.userData = { id: item.id, type: 'toyShelf' };
+  return g;
+};
+
 export const FURNITURE_BUILDERS: Record<string, Builder> = {
   bed: buildBed,
   nightstand: buildNightstand,
@@ -272,4 +325,6 @@ export const FURNITURE_BUILDERS: Record<string, Builder> = {
   bathtub: buildBathtub,
   shower: buildShower,
   toilet: buildToilet,
+  kidBed: buildKidBed,
+  toyShelf: buildToyShelf,
 };

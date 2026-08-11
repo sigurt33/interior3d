@@ -64,6 +64,34 @@ describe('kitchen builders', () => {
   });
 });
 
+describe('kids builders', () => {
+  it('есть строители детской', () => {
+    for (const t of ['kidBed', 'toyShelf'])
+      expect(FURNITURE_BUILDERS[t], t).toBeTypeOf('function');
+  });
+
+  it.each([
+    ['kidBed', 900, 1700, 800],
+    ['toyShelf', 800, 300, 1200],
+  ])('%s вписывается в габарит', (type, w, d, h) => {
+    const g = FURNITURE_BUILDERS[type](mk(type, w, d, h), style);
+    const bb = new THREE.Box3().setFromObject(g);
+    const sz = bb.getSize(new THREE.Vector3());
+    expect(sz.x).toBeLessThanOrEqual(w / 1000 + 0.01);
+    expect(sz.z).toBeLessThanOrEqual(d / 1000 + 0.01);
+    expect(sz.y).toBeLessThanOrEqual(h / 1000 + 0.01);
+    expect(g.userData.type).toBe(type);
+  });
+
+  it('kidBed красит бортики в акцентный цвет из options', () => {
+    const item = mk('kidBed', 900, 1700, 800);
+    item.options = { accentColor: 0x7fc8e8 };
+    const g = FURNITURE_BUILDERS['kidBed'](item, style);
+    const rails = g.children.filter((c) => c.name === 'rail');
+    expect(rails.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
 describe('bathroom builders', () => {
   it('есть строители ванной', () => {
     for (const t of ['vanity', 'bathtub', 'shower', 'toilet'])
