@@ -35,10 +35,10 @@ export function mountViewer(root: HTMLElement, project: RoomProject, onSave?: (p
   controls.target.set(W / 2, H / 3, L / 2);
 
   const CAMERA_VIEWS: Record<string, [number, number, number]> = {
-    'Общий': [W * 1.6, H * 1.8, L * 1.3],
+    'Общий': [W * 0.88, H * 0.92, L * 0.88],
     'От двери': [W / 2, H * 0.6, L * 0.15],
     'Кровать': [W / 2, H * 0.55, L * 0.75],
-    'Сверху': [W / 2, H * 3, L / 2 + 0.01],
+    'Сверху': [W / 2, H * 2.5, L / 2 + 0.01],
   };
   const setView = (name: string) => {
     const [x, y, z] = CAMERA_VIEWS[name];
