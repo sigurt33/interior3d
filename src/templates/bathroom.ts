@@ -57,7 +57,8 @@ export function generateBathroom(
     }
   }
 
-  // 3. Унитаз — на стене двери, рядом с дверью (с обеих сторон пробуем)
+  // 3. Унитаз — фиксированный размер (стандартный компакт, каскадировать нечего), рядом с дверью
+  //    На стене двери, с обеих сторон пробуем
   if (door) {
     const t = { w: 400, d: 650, h: 800 };
     const after = door.offset + door.width + GAP;
@@ -78,5 +79,6 @@ export function bathroomLightPoints(
 ): LightPoint[] {
   const vanity = furniture.find((f) => f.type === 'vanity');
   if (!vanity) return [];
-  return [{ group: 'mirror', x: vanity.position.x, y: 1950, z: vanity.position.z }];
+  // высота над зеркалом, но не выше потолка
+  return [{ group: 'mirror', x: vanity.position.x, y: Math.min(1950, room.height - 200), z: vanity.position.z }];
 }
