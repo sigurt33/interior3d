@@ -83,12 +83,14 @@ const buildDesk: Builder = (item, style) => {
 const buildFridge: Builder = (item, style) => {
   const g = new THREE.Group();
   const w = M(item.size.w), d = M(item.size.d), h = M(item.size.h);
-  g.add(box(w, h, d, style.facade));
+  const body = box(w, h, d - 0.02, style.facade); // корпус тоньше габарита — ручка и шов выступают над фасадом
+  body.position.z = -0.01;
+  g.add(body);
   const seam = box(0.008, h - 0.04, 0.008, style.accent); // шов двери
-  seam.position.set(0, (h - 0.04) / 2, d / 2 - 0.002);
+  seam.position.set(0, (h - 0.04) / 2, d / 2 - 0.018);
   g.add(seam);
   const handle = box(0.02, 0.35, 0.02, style.accent);
-  handle.position.set(w / 4, h * 0.55, d / 2 - 0.015);
+  handle.position.set(w / 4, h * 0.55, d / 2 - 0.01);
   g.add(handle);
   g.userData = { id: item.id, type: 'fridge' };
   return g;
