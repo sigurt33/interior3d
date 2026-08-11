@@ -1,4 +1,4 @@
-import type { FurnitureItem, Opening, RoomProject, WallIndex } from '../core/model';
+import type { FurnitureItem, LightPoint, Opening, RoomProject, WallIndex } from '../core/model';
 import { layoutProblems, placeAtWall } from '../core/layout';
 
 export const BEDROOM_LIGHT_GROUPS = ['ceiling', 'pendants', 'accent'];
@@ -99,8 +99,8 @@ export function generateBedroom(
 export function bedroomLightPoints(
   room: RoomProject['room'],
   furniture: FurnitureItem[],
-): { group: string; x: number; y: number; z: number }[] {
-  const pts: { group: string; x: number; y: number; z: number }[] = [];
+): LightPoint[] {
+  const pts: LightPoint[] = [];
   const stands = furniture.filter((f) => f.type === 'nightstand');
   for (const s of stands)
     pts.push({ group: 'pendants', x: s.position.x, y: room.height - 800, z: s.position.z });

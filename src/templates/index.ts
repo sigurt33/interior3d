@@ -1,9 +1,7 @@
-import type { FurnitureItem, Opening, RoomProject, RoomType } from '../core/model';
+import type { FurnitureItem, LightPoint, Opening, RoomProject, RoomType } from '../core/model';
 import { generateBedroom, bedroomLightPoints, BEDROOM_LIGHT_GROUPS } from './bedroom';
 
-// Точка светильника в мм (мировые координаты комнаты). Группа 'ceiling'
-// шаблонами не задаётся — потолочную сетку строит assemble универсально.
-export interface LightPoint { group: string; x: number; y: number; z: number }
+export type { LightPoint } from '../core/model';
 
 export interface Template {
   generate(room: RoomProject['room'], openings: Opening[]): FurnitureItem[];

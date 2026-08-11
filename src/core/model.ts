@@ -23,6 +23,14 @@ export interface FurnitureItem {
   options: Record<string, unknown>;
 }
 
+// Точка светильника в мм; группу 'ceiling' шаблоны не задают — потолочную сетку строит assemble
+export interface LightPoint {
+  group: string;
+  x: number;
+  y: number;
+  z: number;
+}
+
 export interface LightGroupState {
   id: string;
   on: boolean;
