@@ -187,6 +187,77 @@ const buildChair: Builder = (item, style) => {
   return g;
 };
 
+// Тумба с раковиной и зеркалом; item.size.h — полная высота с зеркалом
+const buildVanity: Builder = (item, style) => {
+  const g = new THREE.Group();
+  const w = M(item.size.w), d = M(item.size.d);
+  const cab = box(w, 0.5, d, style.facade); // навесная тумба
+  cab.position.y = 0.35 + 0.25;
+  g.add(cab);
+  const basin = box(Math.min(0.55, w - 0.1), 0.12, d - 0.1, 0xffffff);
+  basin.position.y = 0.85 + 0.06;
+  g.add(basin);
+  const tap = box(0.03, 0.2, 0.03, style.accent);
+  tap.position.set(0, 0.97 + 0.1, -d / 2 + 0.06);
+  g.add(tap);
+  const mirrorH = Math.min(0.8, M(item.size.h) - 1.1);
+  const mirror = box(w - 0.2, mirrorH, 0.02, 0xbfd4dd); // зеркало на стене
+  mirror.position.set(0, 1.1 + mirrorH / 2, -d / 2 + 0.01);
+  g.add(mirror);
+  g.userData = { id: item.id, type: 'vanity' };
+  return g;
+};
+
+const buildBathtub: Builder = (item, style) => {
+  const g = new THREE.Group();
+  const w = M(item.size.w), d = M(item.size.d), h = M(item.size.h);
+  g.add(box(w, h, d - 0.02, 0xffffff)); // корпус чуть тоньше — экран выступает
+  const inner = box(w - 0.14, 0.04, d - 0.16, 0xe8f0f2); // «вода/дно»
+  inner.position.y = h - 0.06;
+  g.add(inner);
+  const apron = box(w, h - 0.02, 0.015, style.floor); // экран из плитки спереди
+  apron.position.set(0, (h - 0.02) / 2, d / 2 - 0.008);
+  g.add(apron);
+  g.userData = { id: item.id, type: 'bathtub' };
+  return g;
+};
+
+const buildShower: Builder = (item, style) => {
+  const g = new THREE.Group();
+  const w = M(item.size.w), d = M(item.size.d), h = M(item.size.h);
+  const tray = box(w, 0.06, d, 0xffffff);
+  g.add(tray);
+  const glassMat = new THREE.MeshStandardMaterial({
+    color: 0xcfe8ee, transparent: true, opacity: 0.25,
+  });
+  const front = new THREE.Mesh(new THREE.BoxGeometry(w - 0.02, h - 0.1, 0.01), glassMat);
+  front.position.set(0, (h - 0.1) / 2 + 0.06, d / 2 - 0.01);
+  g.add(front);
+  const side = new THREE.Mesh(new THREE.BoxGeometry(0.01, h - 0.1, d - 0.02), glassMat);
+  side.position.set(w / 2 - 0.01, (h - 0.1) / 2 + 0.06, 0);
+  g.add(side);
+  for (const [px, pz] of [[-w / 2 + 0.02, d / 2 - 0.01], [w / 2 - 0.01, -d / 2 + 0.02]] as const) {
+    const profile = box(0.02, h - 0.08, 0.02, style.accent); // чёрный профиль
+    profile.position.set(px, (h - 0.08) / 2 + 0.06, pz);
+    g.add(profile);
+  }
+  g.userData = { id: item.id, type: 'shower' };
+  return g;
+};
+
+const buildToilet: Builder = (item, _style) => {
+  const g = new THREE.Group();
+  const w = M(item.size.w), d = M(item.size.d);
+  const tank = box(w, 0.35, 0.16, 0xffffff); // бачок у стены (−z)
+  tank.position.set(0, 0.45 + 0.175, -d / 2 + 0.08);
+  g.add(tank);
+  const bowl = box(w - 0.03, 0.4, d - 0.2, 0xffffff);
+  bowl.position.set(0, 0.2, 0.06);
+  g.add(bowl);
+  g.userData = { id: item.id, type: 'toilet' };
+  return g;
+};
+
 export const FURNITURE_BUILDERS: Record<string, Builder> = {
   bed: buildBed,
   nightstand: buildNightstand,
@@ -197,4 +268,8 @@ export const FURNITURE_BUILDERS: Record<string, Builder> = {
   hood: buildHood,
   roundTable: buildRoundTable,
   chair: buildChair,
+  vanity: buildVanity,
+  bathtub: buildBathtub,
+  shower: buildShower,
+  toilet: buildToilet,
 };

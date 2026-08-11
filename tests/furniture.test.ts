@@ -63,3 +63,25 @@ describe('kitchen builders', () => {
     expect(named).toHaveLength(2);
   });
 });
+
+describe('bathroom builders', () => {
+  it('есть строители ванной', () => {
+    for (const t of ['vanity', 'bathtub', 'shower', 'toilet'])
+      expect(FURNITURE_BUILDERS[t], t).toBeTypeOf('function');
+  });
+
+  it.each([
+    ['vanity', 1200, 500, 2000],
+    ['bathtub', 1700, 750, 600],
+    ['shower', 900, 900, 2100],
+    ['toilet', 400, 650, 800],
+  ])('%s вписывается в габарит', (type, w, d, h) => {
+    const g = FURNITURE_BUILDERS[type](mk(type, w, d, h), style);
+    const bb = new THREE.Box3().setFromObject(g);
+    const sz = bb.getSize(new THREE.Vector3());
+    expect(sz.x).toBeLessThanOrEqual(w / 1000 + 0.01);
+    expect(sz.z).toBeLessThanOrEqual(d / 1000 + 0.01);
+    expect(sz.y).toBeLessThanOrEqual(h / 1000 + 0.01);
+    expect(g.userData.type).toBe(type);
+  });
+});
