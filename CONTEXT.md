@@ -5,7 +5,7 @@
 
 ## Статус
 - **Ветка**: `plan-1-mvp`
-- **Последний коммит**: `656d079` — feat: валидация RoomProject
+- **Последний коммит**: `20a4da6` — feat: интерфейс ProjectStore и LocalStorageStore
 
 ## Task 1: Каркас проекта (DONE)
 
@@ -82,7 +82,42 @@ vite.config.ts
 ✓ Все 8 тестов проекта зелёные (smoke + model + validate)
 ✓ Коммит создан: `656d079`
 
+## Task 4: ProjectStore / LocalStorageStore (DONE)
+
+### Что сделано
+- Реализована абстракция хранилища проектов согласно TDD
+- Интерфейс `ProjectStore` для декаплирования конструктора от реализации (localStorage → серверная позже)
+- Класс `LocalStorageStore` с поддержкой инжекции Storage-like объекта (для юнит-тестирования без jsdom)
+
+### Архитектура
+- **ProjectListEntry**: `{id, name, updated}` — метаданные для списка проектов
+- **ProjectStore** (интерфейс):
+  - `list(): Promise<ProjectListEntry[]>` — получить список с метаданными
+  - `load(id): Promise<RoomProject | null>` — загрузить проект, null если нет/невалиден
+  - `save(id, project): Promise<void>` — сохранить и обновить индекс
+  - `remove(id): Promise<void>` — удалить проект и обновить индекс
+- **LocalStorageStore**:
+  - Хранит проекты под ключами `interior3d:project:{id}`
+  - Индекс под `interior3d:index` (JSON массив ProjectListEntry)
+  - При save: валидирует, сохраняет, обновляет timestamp
+  - При load: валидирует через `validateProject()`, возвращает null при ошибке
+
+### Особенности
+- Все методы async (готово к серверной реализации)
+- Валидация при load (защита от порченых данных)
+- Инжекция хранилища — тестируется с Map вместо localStorage
+- Error handling: JSON.parse, валидация — всё возвращает null/empty
+
+### Файлы
+- `src/core/store.ts` — интерфейсы и LocalStorageStore
+- `tests/store.test.ts` — 3 теста (save+list+load, remove, load несуществующего)
+
+### Результаты
+✓ Все 11 тестов зелёные (smoke + model + validate + 3 новых store)
+✓ Коммит: `20a4da6`
+
 ## Следующие шаги
-- Task 4: Базовая сцена Three.js
-- Task 5: Renderering 3D стен и полов
-- Task 6: UI слой (Canvas + HTML layout)
+- Task 5: Конструктор Application (инжекция ProjectStore, управление состоянием)
+- Task 6: Базовая сцена Three.js
+- Task 7: Rendering 3D стен и полов
+- Task 8: UI слой (Canvas + HTML layout)
