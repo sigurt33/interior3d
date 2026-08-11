@@ -42,6 +42,7 @@ export function buildRoomShell(project: RoomProject, style: StyleDef): THREE.Gro
 
   const wallMat = new THREE.MeshStandardMaterial({ color: style.wall, side: THREE.DoubleSide });
   const floorMat = new THREE.MeshStandardMaterial({ color: style.floor });
+  // одностороннее — потолок невидим сверху, иначе перекрывает вид «Сверху»
   const ceilMat = new THREE.MeshStandardMaterial({ color: style.ceiling });
 
   const floor = new THREE.Mesh(new THREE.BoxGeometry(W, 0.05, L), floorMat);
