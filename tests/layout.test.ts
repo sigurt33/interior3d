@@ -73,4 +73,16 @@ describe('layoutProblems', () => {
     const blocker = item('bl', 0, 0); // у стены 0, перекрывает зону двери
     expect(layoutProblems([blocker], room, [door]).join()).toContain('дверь');
   });
+
+  it('потолочный предмет (options.ceilingMounted) не конфликтует с мебелью и дверью', () => {
+    const base = item('run', 2, 0, { w: 2400, d: 600, h: 900 });
+    const hood: FurnitureItem = {
+      id: 'hood', type: 'hood', position: { ...base.position }, rotation: 0,
+      size: { w: 400, d: 400, h: 2200 }, options: { ceilingMounted: true },
+    };
+    expect(layoutProblems([base, hood], room, [door])).toEqual([]);
+    // но выход за стены по-прежнему ловится
+    const outside: FurnitureItem = { ...hood, id: 'h2', position: { x: -500, z: 100 } };
+    expect(layoutProblems([base, outside], room, [door]).join()).toContain('за стены');
+  });
 });

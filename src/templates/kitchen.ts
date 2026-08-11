@@ -30,21 +30,6 @@ export function generateKitchen(
     ...placeAtWall(wall, offset, size, W, L),
   });
 
-  // Сдвигает уже размещённый у стены предмет вглубь комнаты так, чтобы его ближний
-  // к стене край оказался на глубине depth от стены (координата вдоль стены не меняется).
-  const pushFromWall = (
-    item: FurnitureItem, wall: WallIndex, depth: number, roomW: number, roomL: number,
-  ): FurnitureItem => {
-    const dd = item.size.d / 2;
-    const target = depth + dd;
-    switch (wall) {
-      case 0: return { ...item, position: { x: item.position.x, z: target } };
-      case 1: return { ...item, position: { x: roomW - target, z: item.position.z } };
-      case 2: return { ...item, position: { x: item.position.x, z: roomL - target } };
-      default: return { ...item, position: { x: target, z: item.position.z } };
-    }
-  };
-
   // 1. Рабочая стена: с окном (линия h900 не перекрывает окно с подоконником 900),
   //    иначе напротив двери; затем остальные.
   const baseOrder: WallIndex[] = door
@@ -72,16 +57,11 @@ export function generateKitchen(
         { cooktopCenter, sinkCenter });
       if (tryAdd(run)) {
         workWall = wall;
-        // 2. Вытяжка над плитой (совпадает по координате x с cooktop). Висит под потолком —
-        //    layoutProblems работает только в 2D (план сверху, без высоты), поэтому чтобы её
-        //    прямоугольник не «пересекался» с линией на плане, отодвигаем её вглубь комнаты
-        //    за дальний край линии (той же координатой вдоль стены, что и плита).
-        const hoodSize = { w: 400, d: 400, h: room.height - 500 < 2200 ? room.height - 500 : 2200 };
-        const hoodOffsetAlong = start + 600 + GAP + cooktopCenter - 200;
-        const hood = mk('hood', 'hood', wall, hoodOffsetAlong, hoodSize);
-        const runDepthEdge = run.size.d + GAP; // за дальним краем линии от стены
-        const pushed = pushFromWall(hood, wall, runDepthEdge, W, L);
-        tryAdd(pushed);
+        // 2. Вытяжка над плитой (совпадает по координате с cooktop); ceilingMounted —
+        //    висит выше мебели, layoutProblems не применяет к ней 2D-коллизии
+        tryAdd(mk('hood', 'hood', wall, start + 600 + GAP + cooktopCenter - 200,
+          { w: 400, d: 400, h: room.height - 500 < 2200 ? room.height - 500 : 2200 },
+          { ceilingMounted: true }));
         break;
       }
       placed.pop(); // откат холодильника, линия не встала

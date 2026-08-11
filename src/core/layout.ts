@@ -55,6 +55,8 @@ export function layoutProblems(
 ): string[] {
   const problems: string[] = [];
   const rects = items.map(itemRect);
+  // потолочные предметы (вытяжка) живут выше мебели — 2D-коллизии к ним не применяются
+  const ceiling = items.map((it) => it.options.ceilingMounted === true);
 
   items.forEach((it, i) => {
     const r = rects[i];
@@ -64,14 +66,14 @@ export function layoutProblems(
 
   for (let i = 0; i < rects.length; i++)
     for (let j = i + 1; j < rects.length; j++)
-      if (rectsOverlap(rects[i], rects[j]))
+      if (!ceiling[i] && !ceiling[j] && rectsOverlap(rects[i], rects[j]))
         problems.push(`${items[i].id} пересекается с ${items[j].id}`);
 
   for (const op of openings) {
     if (op.kind !== 'door' && op.kind !== 'arch') continue;
     const clear = doorClearRect(op, room.width, room.length);
     items.forEach((it, i) => {
-      if (rectsOverlap(rects[i], clear)) problems.push(`${it.id}: блокирует дверь`);
+      if (!ceiling[i] && rectsOverlap(rects[i], clear)) problems.push(`${it.id}: блокирует дверь`);
     });
   }
   return problems;
