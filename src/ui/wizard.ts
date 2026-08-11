@@ -55,12 +55,12 @@ export function mountWizard(root: HTMLElement, onDone: (p: RoomProject) => void)
         if (!inRange(num('w'), 1500, 30000)) return 'Ширина: введите число от 1500 до 30000 мм';
         if (!inRange(num('l'), 1500, 30000)) return 'Длина: введите число от 1500 до 30000 мм';
         if (!inRange(num('h'), 2000, 5000)) return 'Высота потолка: введите число от 2000 до 5000 мм';
-        if (!inRange(num('dw'), 0, 3)) return 'Стена двери: введите число от 0 до 3';
+        if (!inRange(num('dw'), 0, 3) || !Number.isInteger(num('dw'))) return 'Стена двери: введите целое число от 0 до 3';
         if (!Number.isFinite(num('do')) || num('do') < 0) return 'Отступ двери: введите число не меньше 0';
         if (winOn) {
-          if (!inRange(num('ww'), 0, 3)) return 'Стена окна: введите число от 0 до 3';
+          if (!inRange(num('ww'), 0, 3) || !Number.isInteger(num('ww'))) return 'Стена окна: введите целое число от 0 до 3';
           if (!Number.isFinite(num('wo')) || num('wo') < 0) return 'Отступ окна: введите число не меньше 0';
-          if (!Number.isFinite(num('wd')) || num('wd') < 0) return 'Ширина окна: введите число не меньше 0';
+          if (!inRange(num('wd'), 300, 10000)) return 'Ширина окна: введите число от 300 до 10000 мм';
         }
         return null;
       };
@@ -100,16 +100,18 @@ export function mountWizard(root: HTMLElement, onDone: (p: RoomProject) => void)
     ];
     if (hasWindow) openings.push({ kind: 'window', wall: winWall, offset: winOffset, width: winWidth, height: 1400, sill: 900 });
     p.openings = openings;
-    const tpl = TEMPLATES[type]!;
-    p.furniture = tpl.generate(p.room, p.openings);
-    p.lighting.groups = tpl.lightGroups.map((id) => ({ id, on: true, brightness: 0.8 }));
-    // Страховка: при рабочей валидации в step2 сюда попадать не должно
+    // Страховка ДО генерации мебели: невалидные данные (например дробный номер
+    // стены) уронили бы tpl.generate. При рабочей валидации в step2 сюда
+    // попадать не должно. Проект с furniture: [] проходит validateProject.
     const v = validateProject(p);
     if (!v.ok) {
       step2();
       root.querySelector<HTMLDivElement>('#err')!.textContent = v.errors[0];
       return;
     }
+    const tpl = TEMPLATES[type]!;
+    p.furniture = tpl.generate(p.room, p.openings);
+    p.lighting.groups = tpl.lightGroups.map((id) => ({ id, on: true, brightness: 0.8 }));
     onDone(p);
   };
 
