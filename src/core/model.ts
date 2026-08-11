@@ -16,7 +16,7 @@ export interface Opening {
 export interface FurnitureItem {
   id: string;
   type: string;
-  wall?: number;
+  wall?: WallIndex;
   position: { x: number; z: number }; // центр, мм
   rotation: number; // рад, кратно 90°
   size: { w: number; d: number; h: number }; // мм
