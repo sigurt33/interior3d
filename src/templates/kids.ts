@@ -60,7 +60,7 @@ export function generateKids(
 
   // 3. Стол у окна (как в спальне), каскад размеров
   if (win) {
-    for (const dw of [1000, 800, 700, 600]) {
+    for (const dw of [1000, 800, 700]) {
       if (wallLen(win.wall) < dw) continue;
       const dSize = { w: dw, d: 500, h: 750 };
       const center = win.offset + win.width / 2;
