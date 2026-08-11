@@ -89,6 +89,10 @@ describe('kids builders', () => {
     const g = FURNITURE_BUILDERS['kidBed'](item, style);
     const rails = g.children.filter((c) => c.name === 'rail');
     expect(rails.length).toBeGreaterThanOrEqual(2);
+    for (const r of rails) {
+      const mesh = r as THREE.Mesh;
+      expect((mesh.material as THREE.MeshStandardMaterial).color.getHex()).toBe(0x7fc8e8);
+    }
   });
 });
 
