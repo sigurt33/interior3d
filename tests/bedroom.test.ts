@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateBedroom, BEDROOM_LIGHT_GROUPS } from '../src/templates/bedroom';
+import { generateBedroom, BEDROOM_LIGHT_GROUPS, bedroomLightPoints } from '../src/templates/bedroom';
 import { layoutProblems } from '../src/core/layout';
 import type { Opening } from '../src/core/model';
 
@@ -53,5 +53,16 @@ describe('generateBedroom', () => {
 
   it('группы света шаблона', () => {
     expect(BEDROOM_LIGHT_GROUPS).toEqual(['ceiling', 'pendants', 'accent']);
+  });
+
+  it('bedroomLightPoints: подвесы над тумбочками, подсветка у кровати', () => {
+    const r = room(4000, 5000);
+    const items = generateBedroom(r, [door, window_]);
+    const pts = bedroomLightPoints(r, items);
+    const stands = items.filter((i) => i.type === 'nightstand');
+    expect(pts.filter((p) => p.group === 'pendants')).toHaveLength(stands.length);
+    const accent = pts.filter((p) => p.group === 'accent');
+    expect(accent).toHaveLength(1);
+    expect(accent[0].y).toBe(150);
   });
 });

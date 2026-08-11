@@ -94,3 +94,24 @@ export function generateBedroom(
 
   return placed;
 }
+
+// Точки света спальни: подвесы над тумбочками (fallback — центр), подсветка у кровати
+export function bedroomLightPoints(
+  room: RoomProject['room'],
+  furniture: FurnitureItem[],
+): { group: string; x: number; y: number; z: number }[] {
+  const pts: { group: string; x: number; y: number; z: number }[] = [];
+  const stands = furniture.filter((f) => f.type === 'nightstand');
+  for (const s of stands)
+    pts.push({ group: 'pendants', x: s.position.x, y: room.height - 800, z: s.position.z });
+  if (stands.length === 0)
+    pts.push({ group: 'pendants', x: room.width / 2, y: room.height - 800, z: room.length / 2 });
+  const bed = furniture.find((f) => f.type === 'bed');
+  pts.push({
+    group: 'accent',
+    x: bed?.position.x ?? room.width / 2,
+    y: 150,
+    z: bed?.position.z ?? room.length / 2,
+  });
+  return pts;
+}

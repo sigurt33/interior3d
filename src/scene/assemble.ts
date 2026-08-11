@@ -5,6 +5,7 @@ import { buildRoomShell } from './shell';
 import { FURNITURE_BUILDERS } from '../furniture/builders';
 import { kelvinToRGB, sunState } from '../lighting/engine';
 import { M } from '../core/units';
+import { TEMPLATES } from '../templates/index';
 
 const GROUP_BASE_INTENSITY = 25; // базовая мощность PointLight (physical units)
 
@@ -63,16 +64,10 @@ export function assembleScene(project: RoomProject): AssembledScene {
       for (let j = 0; j < rows; j++)
         addLight('ceiling', (W * (i + 0.5)) / cols, H - 0.15, (L * (j + 0.5)) / rows);
   }
-  if (wantGroups.has('pendants')) {
-    const stands = project.furniture.filter((f) => f.type === 'nightstand');
-    for (const s of stands) addLight('pendants', M(s.position.x), H - 0.8, M(s.position.z));
-    if (stands.length === 0) addLight('pendants', W / 2, H - 0.8, L / 2);
-  }
-  if (wantGroups.has('accent')) {
-    const bed = project.furniture.find((f) => f.type === 'bed');
-    if (bed) addLight('accent', M(bed.position.x), 0.15, M(bed.position.z));
-    else addLight('accent', W / 2, 0.15, L / 2);
-  }
+  const tpl = TEMPLATES[project.room.type];
+  if (tpl)
+    for (const p of tpl.lightPoints(project.room, project.furniture))
+      if (wantGroups.has(p.group)) addLight(p.group, M(p.x), M(p.y), M(p.z));
 
   const assembled: AssembledScene = { scene, sun, ambient, groupLights, roomSize: { W, L, H } };
   applyLightingToScene(assembled, project.lighting);
