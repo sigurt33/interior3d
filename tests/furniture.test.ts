@@ -32,3 +32,34 @@ describe('furniture builders', () => {
     expect(g.userData.type).toBe(type);
   });
 });
+
+describe('kitchen builders', () => {
+  it('есть строители кухни', () => {
+    for (const t of ['fridge', 'kitchenRun', 'hood', 'roundTable', 'chair'])
+      expect(FURNITURE_BUILDERS[t], t).toBeTypeOf('function');
+  });
+
+  it.each([
+    ['fridge', 600, 650, 2000],
+    ['kitchenRun', 2400, 600, 900],
+    ['hood', 400, 400, 2200],
+    ['roundTable', 1000, 1000, 750],
+    ['chair', 450, 450, 850],
+  ])('%s вписывается в габарит', (type, w, d, h) => {
+    const g = FURNITURE_BUILDERS[type](mk(type, w, d, h), style);
+    const bb = new THREE.Box3().setFromObject(g);
+    const sz = bb.getSize(new THREE.Vector3());
+    expect(sz.x).toBeLessThanOrEqual(w / 1000 + 0.01);
+    expect(sz.z).toBeLessThanOrEqual(d / 1000 + 0.01);
+    expect(sz.y).toBeLessThanOrEqual(h / 1000 + 0.01);
+    expect(g.userData.type).toBe(type);
+  });
+
+  it('kitchenRun рисует варочную панель и мойку по опциям', () => {
+    const item = mk('kitchenRun', 2400, 600, 900);
+    item.options = { cooktopCenter: 500, sinkCenter: 1400 };
+    const g = FURNITURE_BUILDERS['kitchenRun'](item, style);
+    const named = g.children.filter((c) => c.name === 'cooktop' || c.name === 'sink');
+    expect(named).toHaveLength(2);
+  });
+});
