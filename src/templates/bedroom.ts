@@ -1,32 +1,14 @@
 import type { FurnitureItem, LightPoint, Opening, RoomProject, WallIndex } from '../core/model';
-import { layoutProblems, placeAtWall } from '../core/layout';
+import { GAP, makeTemplateHelpers } from './helpers';
 
 export const BEDROOM_LIGHT_GROUPS = ['ceiling', 'pendants', 'accent'];
-
-const GAP = 100; // мм — зазор между соседними предметами мебели
 
 export function generateBedroom(
   room: RoomProject['room'],
   openings: Opening[],
 ): FurnitureItem[] {
-  const { width: W, length: L } = room;
-  const wallLen = (w: number) => (w % 2 === 0 ? W : L);
   const door = openings.find((o) => o.kind === 'door' || o.kind === 'arch');
-  const placed: FurnitureItem[] = [];
-
-  const tryAdd = (item: FurnitureItem): boolean => {
-    if (layoutProblems([...placed, item], room, openings).length > 0) return false;
-    placed.push(item);
-    return true;
-  };
-
-  const mk = (
-    id: string, type: string, wall: WallIndex, offset: number,
-    size: { w: number; d: number; h: number },
-  ): FurnitureItem => ({
-    id, type, wall, size, options: {},
-    ...placeAtWall(wall, offset, size, W, L),
-  });
+  const { placed, wallLen, tryAdd, mk } = makeTemplateHelpers(room, openings);
 
   // 1. Кровать — приоритетно стена напротив двери, по центру стены; затем остальные стены,
   //    с уменьшением размера кровати, если полноразмерная нигде не влезает.

@@ -1,34 +1,16 @@
 import type { FurnitureItem, LightPoint, Opening, RoomProject, WallIndex } from '../core/model';
-import { layoutProblems, placeAtWall } from '../core/layout';
+import { GAP, makeTemplateHelpers } from './helpers';
 
 export const KITCHEN_LIGHT_GROUPS = ['ceiling', 'spots', 'pendants'];
-
-const GAP = 100; // мм — зазор между соседними предметами
 
 export function generateKitchen(
   room: RoomProject['room'],
   openings: Opening[],
 ): FurnitureItem[] {
   const { width: W, length: L } = room;
-  const wallLen = (w: number) => (w % 2 === 0 ? W : L);
   const door = openings.find((o) => o.kind === 'door' || o.kind === 'arch');
   const win = openings.find((o) => o.kind === 'window');
-  const placed: FurnitureItem[] = [];
-
-  const tryAdd = (item: FurnitureItem): boolean => {
-    if (layoutProblems([...placed, item], room, openings).length > 0) return false;
-    placed.push(item);
-    return true;
-  };
-
-  const mk = (
-    id: string, type: string, wall: WallIndex, offset: number,
-    size: { w: number; d: number; h: number },
-    options: Record<string, unknown> = {},
-  ): FurnitureItem => ({
-    id, type, wall, size, options,
-    ...placeAtWall(wall, offset, size, W, L),
-  });
+  const { placed, wallLen, tryAdd, mk } = makeTemplateHelpers(room, openings);
 
   // 1. Рабочая стена: с окном (линия h900 не перекрывает окно с подоконником 900),
   //    иначе напротив двери; затем остальные.
