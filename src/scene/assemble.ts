@@ -7,6 +7,7 @@ import { kelvinToRGB, sunState } from '../lighting/engine';
 import { M } from '../core/units';
 import { TEMPLATES } from '../templates/index';
 
+// значения откалиброваны визуально под THREE.ACESFilmicToneMapping (см. ui/viewer.ts); при смене tone mapping — пересчитать
 const GROUP_BASE_INTENSITY = 4; // базовая мощность PointLight (physical units)
 
 export interface AssembledScene {
@@ -83,6 +84,7 @@ export function applyLightingToScene(a: AssembledScene, s: LightingState): void 
     st.position.y,
     a.roomSize.L / 2 + st.position.z,
   );
+  // значения откалиброваны визуально под THREE.ACESFilmicToneMapping (см. ui/viewer.ts); при смене tone mapping — пересчитать
   a.ambient.intensity = 0.1 + st.intensity * 1.1;
 
   const lampColor = kelvinToRGB(s.colorTemp);
