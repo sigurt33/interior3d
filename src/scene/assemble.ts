@@ -94,3 +94,16 @@ export function applyLightingToScene(a: AssembledScene, s: LightingState): void 
     }
   }
 }
+
+// Освобождение GPU-ресурсов перед пересборкой сцены (редактирование мебели)
+export function disposeAssembled(a: AssembledScene): void {
+  a.scene.traverse((obj) => {
+    const mesh = obj as THREE.Mesh;
+    if (mesh.geometry) mesh.geometry.dispose();
+    const mat = mesh.material as THREE.Material | THREE.Material[] | undefined;
+    if (Array.isArray(mat)) mat.forEach((m) => m.dispose());
+    else if (mat) mat.dispose();
+  });
+  a.scene.clear();
+  a.groupLights.clear();
+}
