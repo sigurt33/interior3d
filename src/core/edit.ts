@@ -5,13 +5,18 @@ import { TEMPLATES } from '../templates/index';
 // Операции редактирования мебели. Мутируют project только при валидном результате.
 
 // Сдвиг предмета на (dx, dz) мм; false — если сдвиг ломает раскладку
+// привязанные предметы (attachedTo) двигаются вместе с хозяином, как и удаляются
 export function nudgeItem(project: RoomProject, id: string, dx: number, dz: number): boolean {
   const item = project.furniture.find((f) => f.id === id);
   if (!item) return false;
-  const moved = { ...item, position: { x: item.position.x + dx, z: item.position.z + dz } };
-  const rest = project.furniture.filter((f) => f.id !== id);
-  if (layoutProblems([...rest, moved], project.room, project.openings).length > 0) return false;
-  item.position = moved.position;
+  const group = project.furniture.filter((f) => f.id === id || f.options.attachedTo === id);
+  const rest = project.furniture.filter((f) => !group.includes(f));
+  const moved = group.map((f) => ({
+    ...f,
+    position: { x: f.position.x + dx, z: f.position.z + dz },
+  }));
+  if (layoutProblems([...rest, ...moved], project.room, project.openings).length > 0) return false;
+  group.forEach((f, i) => { f.position = moved[i].position; });
   return true;
 }
 

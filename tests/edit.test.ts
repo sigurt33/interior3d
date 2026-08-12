@@ -50,6 +50,18 @@ describe('edit operations', () => {
     expect(p.furniture.find((f) => f.id === 'hood')).toBeUndefined();
   });
 
+  it('nudgeItem двигает привязанные предметы вместе с хозяином', () => {
+    const p = defaultProject('kitchen', 4000, 5000);
+    p.openings.push({ kind: 'door', wall: 0, offset: 100, width: 800, height: 2100 });
+    p.furniture = TEMPLATES.kitchen!.generate(p.room, p.openings);
+    const hood = p.furniture.find((f) => f.id === 'hood')!;
+    const run = p.furniture.find((f) => f.id === 'run')!;
+    const hx = hood.position.x, rx = run.position.x;
+    expect(nudgeItem(p, 'run', -100, 0)).toBe(true);
+    expect(run.position.x).toBe(rx - 100);
+    expect(hood.position.x).toBe(hx - 100); // вытяжка следует за линией
+  });
+
   it('resetFurniture восстанавливает расстановку шаблоном', () => {
     const p = makeProject();
     removeItem(p, 'bed');
