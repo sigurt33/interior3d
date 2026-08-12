@@ -28,7 +28,7 @@ export function mountViewer(root: HTMLElement, project: RoomProject, onSave?: (p
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.9;
+  renderer.toneMappingExposure = 1.0;
 
   let assembled: AssembledScene = assembleScene(project);
   const { W, L, H } = assembled.roomSize;

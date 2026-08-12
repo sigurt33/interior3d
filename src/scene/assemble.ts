@@ -76,14 +76,14 @@ export function assembleScene(project: RoomProject): AssembledScene {
 
 export function applyLightingToScene(a: AssembledScene, s: LightingState): void {
   const st = sunState(s.sunTime);
-  a.sun.intensity = st.intensity * 2;
+  a.sun.intensity = st.intensity * 2.6;
   a.sun.color.setRGB(st.color.r, st.color.g, st.color.b);
   a.sun.position.set(
     a.roomSize.W / 2 + st.position.x,
     st.position.y,
     a.roomSize.L / 2 + st.position.z,
   );
-  a.ambient.intensity = 0.08 + st.intensity * 0.25;
+  a.ambient.intensity = 0.1 + st.intensity * 1.1;
 
   const lampColor = kelvinToRGB(s.colorTemp);
   for (const g of s.groups) {
