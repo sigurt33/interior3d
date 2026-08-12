@@ -43,7 +43,7 @@ export function generateKitchen(
         //    висит выше мебели, layoutProblems не применяет к ней 2D-коллизии
         tryAdd(mk('hood', 'hood', wall, start + 600 + GAP + cooktopCenter - 200,
           { w: 400, d: 400, h: room.height - 500 < 2200 ? room.height - 500 : 2200 },
-          { ceilingMounted: true }));
+          { ceilingMounted: true, attachedTo: 'run' }));
         break;
       }
       placed.pop(); // откат холодильника, линия не встала

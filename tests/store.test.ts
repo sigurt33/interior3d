@@ -36,4 +36,12 @@ describe('LocalStorageStore', () => {
     const store = new LocalStorageStore(fakeStorage());
     expect(await store.load('nope')).toBeNull();
   });
+
+  it('save отклоняет невалидный проект', async () => {
+    const store = new LocalStorageStore(fakeStorage());
+    const bad = defaultProject('bedroom', 4000, 5000) as any;
+    bad.room.width = -5;
+    await expect(store.save('a1', bad)).rejects.toThrow();
+    expect(await store.list()).toHaveLength(0);
+  });
 });

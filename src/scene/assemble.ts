@@ -7,7 +7,8 @@ import { kelvinToRGB, sunState } from '../lighting/engine';
 import { M } from '../core/units';
 import { TEMPLATES } from '../templates/index';
 
-const GROUP_BASE_INTENSITY = 25; // базовая мощность PointLight (physical units)
+// значения откалиброваны визуально под THREE.ACESFilmicToneMapping (см. ui/viewer.ts); при смене tone mapping — пересчитать
+const GROUP_BASE_INTENSITY = 4; // базовая мощность PointLight (physical units)
 
 export interface AssembledScene {
   scene: THREE.Scene;
@@ -76,14 +77,15 @@ export function assembleScene(project: RoomProject): AssembledScene {
 
 export function applyLightingToScene(a: AssembledScene, s: LightingState): void {
   const st = sunState(s.sunTime);
-  a.sun.intensity = st.intensity * 3;
+  a.sun.intensity = st.intensity * 2.6;
   a.sun.color.setRGB(st.color.r, st.color.g, st.color.b);
   a.sun.position.set(
     a.roomSize.W / 2 + st.position.x,
     st.position.y,
     a.roomSize.L / 2 + st.position.z,
   );
-  a.ambient.intensity = 0.1 + st.intensity * 0.3;
+  // значения откалиброваны визуально под THREE.ACESFilmicToneMapping (см. ui/viewer.ts); при смене tone mapping — пересчитать
+  a.ambient.intensity = 0.1 + st.intensity * 1.1;
 
   const lampColor = kelvinToRGB(s.colorTemp);
   for (const g of s.groups) {
@@ -93,4 +95,17 @@ export function applyLightingToScene(a: AssembledScene, s: LightingState): void 
       l.color.setRGB(lampColor.r, lampColor.g, lampColor.b);
     }
   }
+}
+
+// Освобождение GPU-ресурсов перед пересборкой сцены (редактирование мебели)
+export function disposeAssembled(a: AssembledScene): void {
+  a.scene.traverse((obj) => {
+    const mesh = obj as THREE.Mesh;
+    if (mesh.geometry) mesh.geometry.dispose();
+    const mat = mesh.material as THREE.Material | THREE.Material[] | undefined;
+    if (Array.isArray(mat)) mat.forEach((m) => m.dispose());
+    else if (mat) mat.dispose();
+  });
+  a.scene.clear();
+  a.groupLights.clear();
 }

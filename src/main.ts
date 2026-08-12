@@ -14,7 +14,13 @@ function openViewer(p: RoomProject) {
   mountViewer(app, p, (proj) => {
     // автосохранение не должно ронять вьюер (например, QuotaExceededError)
     store.save(CURRENT_ID, proj).catch((e) => console.warn('автосохранение не удалось:', e));
-  });
+  }, startNewRoom);
+}
+
+function startNewRoom() {
+  store.remove(CURRENT_ID).catch(() => undefined);
+  location.hash = '';
+  location.reload();
 }
 
 async function boot() {

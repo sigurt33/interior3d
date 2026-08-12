@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { assembleScene, applyLightingToScene } from '../src/scene/assemble';
+import { assembleScene, applyLightingToScene, disposeAssembled } from '../src/scene/assemble';
 import { defaultProject } from '../src/core/model';
 import { generateBedroom, BEDROOM_LIGHT_GROUPS } from '../src/templates/bedroom';
 
@@ -37,5 +37,17 @@ describe('assembleScene', () => {
     const day = a.sun.intensity;
     applyLightingToScene(a, { ...p.lighting, sunTime: 3 });
     expect(a.sun.intensity).toBeLessThan(day);
+  });
+
+  it('disposeAssembled очищает сцену и освобождает геометрии', () => {
+    const a = assembleScene(makeProject());
+    let disposed = 0;
+    a.scene.traverse((o) => {
+      const m = o as { geometry?: { addEventListener: (t: string, f: () => void) => void } };
+      if (m.geometry) m.geometry.addEventListener('dispose', () => disposed++);
+    });
+    disposeAssembled(a);
+    expect(a.scene.children).toHaveLength(0);
+    expect(disposed).toBeGreaterThan(0);
   });
 });
