@@ -15,9 +15,12 @@ export function nudgeItem(project: RoomProject, id: string, dx: number, dz: numb
   return true;
 }
 
+// привязанные предметы (options.attachedTo) удаляются вместе с хозяином — вытяжка с линией
 export function removeItem(project: RoomProject, id: string): boolean {
   const before = project.furniture.length;
-  project.furniture = project.furniture.filter((f) => f.id !== id);
+  project.furniture = project.furniture.filter(
+    (f) => f.id !== id && f.options.attachedTo !== id,
+  );
   return project.furniture.length < before;
 }
 

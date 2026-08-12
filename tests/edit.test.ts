@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { nudgeItem, removeItem, resetFurniture } from '../src/core/edit';
 import { defaultProject } from '../src/core/model';
 import { generateBedroom } from '../src/templates/bedroom';
+import { TEMPLATES } from '../src/templates/index';
 import { layoutProblems } from '../src/core/layout';
 
 function makeProject() {
@@ -38,6 +39,15 @@ describe('edit operations', () => {
     expect(removeItem(p, 'wardrobe')).toBe(true);
     expect(p.furniture.find((f) => f.id === 'wardrobe')).toBeUndefined();
     expect(removeItem(p, 'wardrobe')).toBe(false); // второй раз — нечего удалять
+  });
+
+  it('removeItem каскадно удаляет привязанные предметы (вытяжка с линией)', () => {
+    const p = defaultProject('kitchen', 4000, 5000);
+    p.openings.push({ kind: 'door', wall: 0, offset: 100, width: 800, height: 2100 });
+    p.furniture = TEMPLATES.kitchen!.generate(p.room, p.openings);
+    expect(p.furniture.find((f) => f.id === 'hood')).toBeTruthy();
+    expect(removeItem(p, 'run')).toBe(true);
+    expect(p.furniture.find((f) => f.id === 'hood')).toBeUndefined();
   });
 
   it('resetFurniture восстанавливает расстановку шаблоном', () => {
