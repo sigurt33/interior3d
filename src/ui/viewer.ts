@@ -4,6 +4,7 @@ import type { RoomProject } from '../core/model';
 import { assembleScene, applyLightingToScene, type AssembledScene } from '../scene/assemble';
 import { LIGHT_PRESETS, applyPreset } from '../lighting/engine';
 import { encodeShare } from '../core/share';
+import { wallVisibleFor } from '../scene/dollhouse';
 
 const GROUP_NAMES: Record<string, string> = {
   ceiling: 'Потолочный', pendants: 'Подвесы', accent: 'Подсветка', spots: 'Споты', mirror: 'Подсветка зеркала',
@@ -35,7 +36,7 @@ export function mountViewer(root: HTMLElement, project: RoomProject, onSave?: (p
   controls.target.set(W / 2, H / 3, L / 2);
 
   const CAMERA_VIEWS: Record<string, [number, number, number]> = {
-    'Общий': [W * 0.88, H * 0.92, L * 0.88],
+    'Общий': [W * 1.5, H * 1.6, L * 1.25],
     'От двери': [W / 2, H * 0.6, L * 0.15],
     'Детали': [W / 2, H * 0.55, L * 0.75],
     'Сверху': [W / 2, H * 2.5, L / 2 + 0.01],
@@ -141,6 +142,10 @@ export function mountViewer(root: HTMLElement, project: RoomProject, onSave?: (p
 
   renderer.setAnimationLoop(() => {
     controls.update();
+    for (let i = 0; i < 4; i++) {
+      const wall = assembled.scene.getObjectByName(`wall-${i}`);
+      if (wall) wall.visible = wallVisibleFor(i, camera.position, W, L);
+    }
     renderer.render(assembled.scene, camera);
   });
 }
