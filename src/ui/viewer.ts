@@ -8,6 +8,15 @@ import { wallVisibleFor } from '../scene/dollhouse';
 import { pickFurnitureAt, setHighlight } from '../scene/picking';
 import { nudgeItem, removeItem, resetFurniture } from '../core/edit';
 
+function showToast(root: HTMLElement, text: string): void {
+  const t = document.createElement('div');
+  t.textContent = text;
+  t.style.cssText = 'position:absolute;bottom:12px;left:50%;transform:translateX(-50%);'
+    + 'background:#333;color:#fff;padding:10px 16px;border-radius:8px;z-index:10;max-width:90%';
+  root.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
 const GROUP_NAMES: Record<string, string> = {
   ceiling: 'Потолочный', pendants: 'Подвесы', accent: 'Подсветка', spots: 'Споты', mirror: 'Подсветка зеркала',
 };
@@ -193,11 +202,12 @@ export function mountViewer(root: HTMLElement, project: RoomProject, onSave?: (p
 
   root.querySelector<HTMLButtonElement>('#share')!.onclick = async () => {
     const url = location.origin + location.pathname + encodeShare(project);
+    const container = canvas.parentElement!;
     try {
       await navigator.clipboard.writeText(url);
-      alert('Ссылка скопирована:\n' + url);
+      showToast(container, 'Ссылка скопирована');
     } catch {
-      prompt('Скопируйте ссылку:', url);
+      showToast(container, 'Скопируйте ссылку: ' + url);
     }
   };
 

@@ -50,6 +50,8 @@ export class LocalStorageStore implements ProjectStore {
   }
 
   async save(id: string, p: RoomProject): Promise<void> {
+    const v = validateProject(p);
+    if (!v.ok) throw new Error('невалидный проект: ' + v.errors[0]);
     this.storage.setItem(PREFIX + id, JSON.stringify(p));
     const index = this.readIndex().filter((e) => e.id !== id);
     index.push({ id, name: p.meta.name, updated: new Date().toISOString() });
