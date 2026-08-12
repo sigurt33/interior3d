@@ -3,18 +3,22 @@
 //   npm run shots [-- http://localhost:5173/]
 // Кадры пишутся в ./shots/ (в .gitignore).
 //
-// Примечание: Если playwright не найден при импорте, используй:
-//   npm install -g playwright
-// либо установи локально: npm install playwright
+// Playwright: установите локально (npm i -D playwright) либо укажите путь
+// к глобальной установке через переменную окружения PLAYWRIGHT_HOME, например:
+//   set PLAYWRIGHT_HOME=%APPDATA%\npm\node_modules\playwright        (Windows cmd)
+//   $env:PLAYWRIGHT_HOME="$env:APPDATA\npm\node_modules\playwright"  (PowerShell)
 import { mkdirSync } from 'node:fs';
 
 let chromium;
 try {
-  const pw = await import('playwright');
-  chromium = pw.chromium;
-} catch (e) {
-  const globalPw = await import('file://C:/Users/User/AppData/Roaming/npm/node_modules/playwright/index.mjs');
-  chromium = globalPw.chromium;
+  ({ chromium } = await import('playwright'));
+} catch {
+  const p = process.env.PLAYWRIGHT_HOME; // путь к глобальной установке playwright
+  if (!p) {
+    console.error('playwright не найден. Установите его (npm i -D playwright) или задайте PLAYWRIGHT_HOME=путь к глобальному пакету playwright');
+    process.exit(1);
+  }
+  ({ chromium } = await import('file://' + p.replaceAll('\\', '/') + '/index.mjs'));
 }
 
 const BASE = process.argv[2] ?? 'http://localhost:5173/';
